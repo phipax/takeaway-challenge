@@ -30,11 +30,41 @@ describe Placeorder do
       subject = Placeorder.new(takeawaymenu,pricelist)
       expect{subject.need(dish,5)}.to raise_error{"No dish specified"} if !dish
     end
+    it "Throws error if quantity is Zero" do
+      dish = "pulaorice"
+      quantity = 0
+      allow(pricelist).to receive(:getprice).with(dish).and_return(1)
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      expect{subject.need(dish,quantity)}.to raise_error{"Quantity cannot be less than 1"} if quantity == 0
+    end
     it "Every need is added to a order hash along with unitprice and quantity" do
       dish = "pulaorice"
       expect(pricelist).to receive(:getprice)
       subject = Placeorder.new(takeawaymenu,pricelist)
       subject.need(dish)
+    end
+  end
+
+  context "#Review order" do
+    # it "Review the order" do
+    #   dish = "pulaorice"
+    #   allow(pricelist).to receive(:getprice).with(dish).and_return(5)
+    #   subject = Placeorder.new(takeawaymenu,pricelist)
+    #   subject.need(dish,5)
+    #   expect(subject.review).to eq "Kindly Confirm to place the order!"
+    # end
+    it "Raise error if review is invoked when no orders have been made" do
+      dish = "pulaorice"
+      allow(pricelist).to receive(:getprice).with(dish).and_return(5)
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      expect{subject.review}.to raise_error{"No Order history please order before review"} if subject.totalprice == 0.00
+    end
+  end
+
+  context "#Confirm order" do
+    it "Throws error if there is nothing to confirm" do
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      expect{subject.confirmorder}.to raise_error{"No Order history detected"} if subject.totalprice == 0.00
     end
   end
 

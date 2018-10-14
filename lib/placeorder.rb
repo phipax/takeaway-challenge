@@ -2,21 +2,35 @@ require './lib/takeawaymenu'
 require './lib/pricelist'
 class Placeorder
   attr_reader :menu, :plist, :dishlist, :totalprice
+
   def initialize (twm = Takeawaymenu.new, pl = Pricelist.new)
     @menu = twm
     @plist = pl
-    @totalprice = 0
+    @totalprice = 0.00
     @dishlist = Hash.new
+    @invoice =  "Details of your Order: \n"
+    @invoice << "---------------------- \n"
+    @invoice << "#\t\tDish\t\tQty - UnitPrice\t\tItemTotal(£)\n"
+    @inv_ctr = 1
     @menu.list
   end
+
   def need(dish,quantity = 1)
     raise "No dish specified" if !dish
-    puts @totalprice
-    puts @plist.getprice(dish)
-    @totalprice += (@plist.getprice(dish) * quantity)
-    puts "after compute #{@totalprice}"
-    #@dishlist[dish] = unitprice
-    #@dishlist[dish] = quantity
+    raise "Quantity cannot be less than 1" if quantity == 0
+    #puts @plist.getprice(dish)
+    @totalprice += (@plist.getprice(dish).to_f * quantity).to_f
+    @invoice << "#{@inv_ctr}:\t\t#{dish.capitalize}\t\t#{quantity}x#{@plist.getprice(dish)}\t\t#{(quantity*@plist.getprice(dish)).to_f}\n"
+    @inv_ctr +=1
     "Order accepted"
+  end
+
+  def review
+    raise "No Order history please order before review" if @totalprice == 0.00
+    @invoice << "----------\t------------\t\t-----\t\t-----\n"
+    @invoice << "Final Bill\t\t\t\t\t\t#{@totalprice}\n"
+    @invoice << "----------\t------------\t\t-----\t\t-----\n"
+    #"Kindly Confirm to place the order!"
+    #@totalprice
   end
 end
