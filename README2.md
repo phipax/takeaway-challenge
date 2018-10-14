@@ -94,7 +94,6 @@ Details of your Order:
 4:              Naanbreads              5x3.0           15.0
 5:              Tikkamasala             4x5.0           20.0
 6:              Cottagepies             10x5.0          50.0
-
 7:              Sundayroast             10x10.0         100.0
 8:              Jacketpotato            1x3.0           3.0
 ----------      ------------            -----           -----
