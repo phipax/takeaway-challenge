@@ -1,5 +1,7 @@
 require './lib/takeawaymenu'
 require './lib/pricelist'
+require './lib/sms'
+
 class Placeorder
   attr_reader :menu, :plist, :dishlist, :totalprice
 
@@ -30,7 +32,17 @@ class Placeorder
     @invoice << "----------\t------------\t\t-----\t\t-----\n"
     @invoice << "Final Bill\t\t\t\t\t\t#{@totalprice}\n"
     @invoice << "----------\t------------\t\t-----\t\t-----\n"
-    #"Kindly Confirm to place the order!"
+    "Kindly call confirmorder to place the order!"
     #@totalprice
+  end
+
+  # Need a method to reset the order
+  #def cancel
+  #end
+
+  def confirmorder (sms = Sms.new)
+    raise "No Order history detected" if @totalprice == 0.0
+    sms.send
+    "You should receive confirmation text shortly"
   end
 end

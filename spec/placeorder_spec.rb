@@ -4,7 +4,10 @@ describe Placeorder do
 
   let(:takeawaymenu) {double :takeawaymenu, :list => "dish"}
   let(:pricelist)    {double :pricelist, :getprice => 2}
-  subject(:Placeholder) {described_class.new(takeawaymenu)}
+  let(:client)       {double :client}
+  let(:sms)          {double :sms, :send => "You should receive confirmation text shortly"}
+
+  subject(:placeholder) {described_class.new(takeawaymenu)}
 
   context "class Placeorder" do
     it "Checks for the order instance & displays the menulist" do
@@ -17,7 +20,7 @@ describe Placeorder do
     end
   end
 
-  context "#order('dish','quantity')" do
+  context "#need('dish','quantity')" do
     it "Confirms the order" do
       dish = "stirfryrice"
       allow(pricelist).to receive(:getprice).with(dish).and_return(1)
@@ -46,13 +49,13 @@ describe Placeorder do
   end
 
   context "#Review order" do
-    # it "Review the order" do
-    #   dish = "pulaorice"
-    #   allow(pricelist).to receive(:getprice).with(dish).and_return(5)
-    #   subject = Placeorder.new(takeawaymenu,pricelist)
-    #   subject.need(dish,5)
-    #   expect(subject.review).to eq "Kindly Confirm to place the order!"
-    # end
+    it "Review the order" do
+      dish = "pulaorice"
+      allow(pricelist).to receive(:getprice).with(dish).and_return(5)
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      subject.need(dish,5)
+      expect(subject.review).to eq "Kindly call confirmorder to place the order!"
+    end
     it "Raise error if review is invoked when no orders have been made" do
       dish = "pulaorice"
       allow(pricelist).to receive(:getprice).with(dish).and_return(5)
@@ -62,9 +65,22 @@ describe Placeorder do
   end
 
   context "#Confirm order" do
+    it "Confirm the order" do
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      dish = "pulaorice"
+      subject.need(dish,5)
+      expect(subject.confirmorder(sms)).to eq "You should receive confirmation text shortly"
+    end
     it "Throws error if there is nothing to confirm" do
       subject = Placeorder.new(takeawaymenu,pricelist)
-      expect{subject.confirmorder}.to raise_error{"No Order history detected"} if subject.totalprice == 0.00
+      expect{subject.confirmorder}.to raise_error{"No Order history detected"} if subject.totalprice == 0.0
+    end
+    it "Calls the sms service" do
+      subject = Placeorder.new(takeawaymenu,pricelist)
+      dish = "pulaorice"
+      subject.need(dish,5)
+      expect(sms).to receive(:send).with(no_args) 
+      subject.confirmorder(sms)
     end
   end
 
